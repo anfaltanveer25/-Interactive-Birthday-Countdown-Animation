@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Countdown</title>
+    <style>
+        body {
+            margin: 0;
+            background: #0b0f17;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+        }
+
+        .bg-star {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: twinkle 1.8s infinite ease-in-out;
+        }
+        
+        @keyframes twinkle {
+            0% { opacity: 0.1; }
+            50% { opacity: 1; }
+            100% { opacity: 0.1; }
+        }
+
+        #container {
+            position: absolute;
+            text-align: center;
+        }
+
+        #count {
+            font-size: 150px;
+            font-weight: 900;
+            opacity: 0;
+            transition: 0.3s;
+            text-shadow: 0 0 25px, 0 0 50px;
+        }
+
+        .word-green { color: #50fa7b; text-shadow: 0 0 20px #50fa7b, 0 0 40px #28a745; }
+        .word-red { color: #ff5555; text-shadow: 0 0 20px #ff5555, 0 0 40px #ff5555; }
+        .word-pink { color: #ff79c6; text-shadow: 0 0 20px #ff79c6, 0 0 40px #ff79c6; }
+        .word-purple { color: #bd93f9; text-shadow: 0 0 20px #bd93f9, 0 0 40px #bd93f9; }
+        .word-yellow { color: #f1fa8c; text-shadow: 0 0 20px #f1fa8c, 0 0 40px #f1fa8c; }
+        .word-white { color: #ffffff; text-shadow: 0 0 20px #ffffff, 0 0 40px #ffffff; }
+        .word-blue { color: #8be9fd; text-shadow: 0 0 20px #8be9fd, 0 0 40px #8be9fd; }
+
+        #word {
+            font-size: 120px;
+            font-weight: 700;
+            opacity: 0;
+            transition: 0.5s;
+        }
+
+        #cake {
+            opacity: 0;
+            transition: 1s;
+            margin-top: 30px;
+            font-size: 180px;
+            position: relative;
+            display: inline-block;
+            animation: cakeBounce 1s ease-in-out infinite alternate;
+        }
+        
+        @keyframes cakeBounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-20px); }
+        }
+
+        .confetti {
+            position: fixed;
+            top: -10px;
+            width: 12px;
+            height: 12px;
+            background: white;
+            opacity: 0.9;
+            border-radius: 2px;
+            animation: drop 1.5s ease-out forwards;
+        }
+        
+        @keyframes drop {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(120vh) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        for (let s = 0; s < 60; s++) {
+            let star = document.createElement("div");
+            star.classList.add("bg-star");
+            let size = Math.random() * 4 + 4;
+            star.style.width = size + "px";
+            star.style.height = size + "px";
+            star.style.top = Math.random() * 100 + "vh";
+            star.style.left = Math.random() * 100 + "vw";
+            star.style.animationDelay = (Math.random() * 1.5) + "s";
+            document.body.appendChild(star);
+        }
+    </script>
+    <div id="container">
+        <div id="count"></div>
+        <div id="word"></div>
+        <div id="cake">🎂</div>
+    </div>
+    <script>
+        let count = 3;
+        let countBox = document.getElementById("count");  
+        let wordBox = document.getElementById("word");    
+        let cake = document.getElementById("cake");
+
+        let words = [
+            { text: "HAPPY", class: "word-purple" },
+            { text: "BIRTHDAY", class: "word-yellow" },
+            { text: "TO YOU", class: "word-white" },
+            { text: "DEAR BESTIE", class: "word-blue" }
+        ];
+        let numberColors = ["word-green", "word-red", "word-pink"]; // indices 0,1,2
+        let i = 0;
+        function celebrateBoom() {
+            for (let i = 0; i < 150; i++) {
+                let conf = document.createElement("div");
+                conf.classList.add("confetti");
+                conf.style.left = Math.random() * 100 + "vw";
+                conf.style.background = "#" + Math.floor(Math.random() * 16777215).toString(16);
+                let size = Math.random() * 10 + 6;
+                conf.style.width = size + "px";
+                conf.style.height = size + "px";
+                conf.style.animationDuration = (Math.random() * 1 + 1) + "s";
+                document.body.appendChild(conf);
+                setTimeout(() => conf.remove(), 2000);
+            }
+        }
+        function startCountdown() {
+            let timer = setInterval(() => {
+                countBox.textContent = count;
+                countBox.style.opacity = 1;
+                countBox.style.transform = "scale(1.5)";
+                if (count > 0) {
+                    countBox.className = numberColors[3 - count];
+                }
+                setTimeout(() => {
+                    countBox.style.opacity = 0;
+                    countBox.style.transform = "scale(1)";
+                }, 500);
+                if (count === 0) {
+                    count--;
+                    return;
+                }
+                count--;
+                if (count < 0) {
+                    clearInterval(timer);
+                    countBox.style.display = "none";
+                    showWord();
+                }
+            }, 900);
+        }
+        
+        /* show words */
+        function showWord() {
+            if (i >= words.length) {
+                showCake();
+                return;
+            }
+            wordBox.textContent = words[i].text;
+            wordBox.className = words[i].class;
+            wordBox.style.opacity = 1;
+            setTimeout(() => {
+                wordBox.style.opacity = 0;
+                i++;
+                setTimeout(showWord, 500);
+            }, 1000);
+        }
+        function showCake() {
+            cake.style.opacity = 1;
+            celebrateBoom();  
+        }
+        startCountdown();
+    </script>
+</body>
+</html>
